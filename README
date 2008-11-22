@@ -1,0 +1,1 @@
+PyUnit provides a basic set of assertions which can get you started with unit testing python, but it's always useful to have more. Django also has a few specific requirements and common patterns when it comes to testing. This set of classes aims to provide a useful starting point for both these situations.
