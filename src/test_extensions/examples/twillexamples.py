@@ -1,4 +1,4 @@
-from twillcommon import TwillCommon
+from test_extensions.twill import TwillCommon
 
 class TwillExample(TwillCommon):
     """
@@ -6,7 +6,7 @@ class TwillExample(TwillCommon):
     """
 
     # set a global url. Note you might do this from a settings file.
-    url = "http://www.morethanseven.net/"
+    url = "http://www.example.com/"
 
     def test_for_200_status_code(self):
         "Does the provided url return an HTTP status code of 200"

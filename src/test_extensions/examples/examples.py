@@ -1,4 +1,4 @@
-from common import Common
+from test_extensions.common import Common
 
 class Examples(Common):
     """
