@@ -32,19 +32,24 @@ class DjangoCommon(Common):
           
     def login_as_admin(self):
         "Create, then login as, an admin user"
-        user = User.objects.create_user('admin', 'admin@example.com', 'password')
-        user.is_staff = True
-        user.is_superuser = True
-        user.save()
+        # Only create the user if they don't exist already ;)
+        try:
+            User.objects.get(username="admin")
+        except User.DoesNotExist:
+            user = User.objects.create_user('admin', 'admin@example.com', 'password')
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
+        
         if not self.client.login(username='admin', password='password'):
             raise Exception("Login failed")
   
     # Some assertions need to know which template tag libraries to load
-    # so we provide a list of templatetag libraries        
+    # so we provide a list of templatetag libraries
     template_tag_libraries = []
 
     def render(self, template, **kwargs):
-        "Return the rendering of a given template including loading of template tags"        
+        "Return the rendering of a given template including loading of template tags"
         template = "".join(["{%% load %s %%}" % lib for lib in self.template_tag_libraries]) + template
         return Template(template).render(Context(kwargs)).strip()
   
