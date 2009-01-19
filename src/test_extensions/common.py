@@ -50,7 +50,7 @@ class Common(TestCase):
 
     def assert_not_equal(self, *args, **kwargs):
         "Assert that two values are not equal"
-        return not self.assertEqual(*args, **kwargs)
+        return not self.assertNotEqual(*args, **kwargs)
     
     def assert_contains(self, needle, haystack):
         "Assert that one value (the hasystack) contains another value (the needle)"
