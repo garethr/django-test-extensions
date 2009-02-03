@@ -56,10 +56,10 @@ class Examples(Common):
             'description': 'description',
         }
         self.login_as_admin()
-        self.assert_counts([0,], [Object,])
+        self.assert_counts([0], [Object])
         response = self.client.post('/admin/objects/object/add/', form)
         self.assert_code(response, 302)
-        self.assert_counts([1,], [Object,])
+        self.assert_counts([1], [Object])
             
     def test_you_can_delete_objects_you_created(self):
         "Test object deletion via the admin"
@@ -68,11 +68,11 @@ class Examples(Common):
             'title':       'title',
             'description': 'description',
         }
-        self.assert_counts([0,], [Object,])
+        self.assert_counts([0], [Object])
         self.client.post('/admin/objects/object/add/', form)
-        self.assert_counts([1,], [Object,])
-        response = self.client.post('/admin/objects/object/%d/delete/' % Object.objects.get().id, {})
-        self.assert_counts([0,], [Object,])
+        self.assert_counts([1], [Object])
+        response = self.client.post('/admin/objects/object/%d/delete/' % Object.objects.get().id, {'post':'yes'})
+        self.assert_counts([0], [Object])
                 
     def test_assert_renders(self):
         "Example template tag test to check correct rendering"
