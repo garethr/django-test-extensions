@@ -1,3 +1,5 @@
+import os
+
 # Test classes inherit from the Django TestCase
 from django.test import TestCase
 
