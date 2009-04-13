@@ -1,3 +1,5 @@
+import os
+
 # Test classes inherit from the Django TestCase
 from django.test import TestCase
 
@@ -103,3 +105,11 @@ class Common(TestCase):
     def assert_file_exists(self, file_path):
         "Assert a given file exists"
         self.assertTrue(os.path.exists(file_path), "%s does not exist!" % file_path)
+
+    def assert_has_attr(self, obj, attr):
+        "Assert a given object has a give attribute, without checking the values"
+        try:
+            getattr(obj, attr)
+            assert(True)
+        except AttributeError:
+            assert(False)
