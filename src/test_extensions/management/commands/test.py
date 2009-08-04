@@ -6,10 +6,6 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--verbosity', action='store', dest='verbosity', 
-            default='1',
-            type='choice', choices=['0', '1', '2'],
-            help='Verbosity level; 0=minimal, 1=normal, 2=all'),
         make_option('--noinput', action='store_false', dest='interactive', 
             default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
