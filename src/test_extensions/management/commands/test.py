@@ -1,6 +1,7 @@
 import sys
 from optparse import make_option
 
+from django.core import management
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -28,6 +29,13 @@ class Command(BaseCommand):
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
+        
+        # it's quite possible someone, lets say South, might have stolen
+        # the syncdb command from django. For testing purposes we should
+        # probably put it back. Migrations don't really make sense
+        # for tests. Actually the South test runner does this too.
+        management.get_commands()
+        management._commands['syncdb'] = 'django.core'
 
         if options.get('coverage'):
             test_runner_name = 'test_extensions.testrunners.codecoverage.run_tests'

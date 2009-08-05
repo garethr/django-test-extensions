@@ -1,0 +1,55 @@
+PyUnit provides a basic set of assertions which can get you started with unit testing python, but it's always useful to have more. Django also has a few specific requirements and common patterns when it comes to testing. This set of classes aims to provide a useful starting point for both these situations.
+
+The application also overrides the default Django test runner, adding a few useful features:
+
+h2. Installation
+
+Just add the project to your INSTALLED_APPS.
+
+<pre>INSTALLED_APPS = (
+	'test_extensions',
+)</pre>
+
+Note that this application steals the test command from django, overriding it with extra toys. If another application in your INSTALLED_APPS does this too then the last one in the list will win. South migrations does this in order to use the django syncdb command for testing, which test_extensions does too. As of 0.4 test_extensions works with South, just as long as you include it after south in the list of installed apps.
+
+h2. XMLUnit 
+
+Sometimes it's nice to have a file reporting the results of a test run. Some applications such as CruiseControl can use this to display the results in a user interface.
+
+<pre>python manage.py test --xml</pre>
+
+h2. Code Coverage
+
+If you want to know what code is being run when you run your test suite then codecoverage is for you. These two flags use two different third party libraries to calculate coverage statistics. The first dumps the results to stdout, the second creates a series of files displaying the results.
+
+<pre>python manage.py test --coverage<pre>
+<pre>python manage.py test --figleaf</pre>
+
+h2. Licence
+
+XMLUnit is included out of convenience. It was written by Marc-Elian Begin <Marc-Elian.Begin@cern.ch> and is Copyright (c) Members of the EGEE Collaboration. 2004. http://www.eu-egee.org
+
+The rest of the code is licensed under an MIT license:
+
+Copyright (c) 2008 Gareth Rushgrove <gareth@morethanseven.net> 
+ 
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+ 
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+ 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
