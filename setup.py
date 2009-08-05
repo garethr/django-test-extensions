@@ -12,7 +12,10 @@ setup(
     license = "MIT License",
     keywords = "django testing",
     description = "A few classes to make testing django applications easier",
-
+    install_requires=[
+        'setuptools',
+        'BeautifulSoup',
+    ],
     classifiers = [
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
