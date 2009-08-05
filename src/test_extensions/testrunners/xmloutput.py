@@ -27,9 +27,10 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
         suite.addTest(test)
 
     old_name = settings.DATABASE_NAME
-    create_test_db(verbosity, autoclobber=not interactive)
+    from django.db import connection
+    connection.creation.create_test_db(verbosity, autoclobber=not interactive)
     result = XMLTestRunner(verbosity=verbosity).run(suite)
-    destroy_test_db(old_name, verbosity)
+    connection.creation.destroy_test_db(old_name, verbosity)
     
     teardown_test_environment()
     
