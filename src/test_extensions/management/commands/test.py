@@ -18,6 +18,8 @@ class Command(BaseCommand):
             help='Produce figleaf coverage report'),
         make_option('--xml', action='store_true', dest='xml', default=False,
             help='Produce xml output for cruise control'),
+        make_option('--nodb', action='store_true', dest='nodb', default=False,
+            help='No database required for these tests'),
     )
     help = """Custom test command which allows for 
         specifying different test runners."""
@@ -37,7 +39,12 @@ class Command(BaseCommand):
         management.get_commands()
         management._commands['syncdb'] = 'django.core'
 
-        if options.get('coverage'):
+        if options.get('nodb'):
+            if options.get('coverage'):
+                test_runner_name = 'test_extensions.testrunners.nodatabase.run_tests_with_coverage'
+            else:
+                test_runner_name = 'test_extensions.testrunners.nodatabase.run_tests'
+        elif options.get('coverage'):
             test_runner_name = 'test_extensions.testrunners.codecoverage.run_tests'
         elif options.get('figleaf'):
             test_runner_name = 'test_extensions.testrunners.figleafcoverage.run_tests'
@@ -56,6 +63,6 @@ class Command(BaseCommand):
         test_runner = getattr(test_module, test_path[-1])
 
         failures = test_runner(test_labels, verbosity=verbosity, 
-            interactive=interactive)
+                interactive=interactive)
         if failures:
             sys.exit(failures)

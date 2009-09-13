@@ -25,6 +25,13 @@ If you want to know what code is being run when you run your test suite then cod
 <pre>python manage.py test --coverage<pre>
 <pre>python manage.py test --figleaf</pre>
 
+h2. No Database
+
+Sometimes your don't want the overhead of setting up a database during testing, probably because your application just doesn't use it.
+
+<pre>python manage.py test --nodb</pre>
+<pre>python manage.py test --nodb --coverage</pre>
+
 h2. Licence
 
 XMLUnit is included out of convenience. It was written by Marc-Elian Begin <Marc-Elian.Begin@cern.ch> and is Copyright (c) Members of the EGEE Collaboration. 2004. http://www.eu-egee.org

@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name = "django-test-extensions",
-    version = "0.4",
+    version = "0.5",
     author = "Gareth Rushgrove",
-    author_email = "gareth@morethanseven.net",    
+    author_email = "gareth@morethanseven.net",
     url = "http://github.com/garethr/django-test-extensions/",
     
     packages = find_packages('src'),
@@ -15,6 +15,7 @@ setup(
     install_requires=[
         'setuptools',
         'BeautifulSoup',
+        'coverage',
     ],
     classifiers = [
         "Intended Audience :: Developers",

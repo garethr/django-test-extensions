@@ -6,6 +6,8 @@ from django.conf import settings
 from django.test.simple import run_tests as django_test_runner
 from django.db.models import get_app, get_apps
 
+from nodatabase import run_tests as nodatabase_run_tests
+
 def get_coverage_modules(app_module):
     """
     Returns a list of modules to report coverage info for, given an
@@ -31,7 +33,8 @@ def get_all_coverage_modules(app_module):
     mod_list = []
     for root, dirs, files in os.walk(app_dirpath):
         root_path = app_path + root[len(app_dirpath):].split(os.path.sep)[1:]
-        if app_path[0] not in settings.EXCLUDE_FROM_COVERAGE:
+        excludes = getattr(settings, 'EXCLUDE_FROM_COVERAGE', [])
+        if app_path[0] not in excludes:
             for file in files:
                 if file.lower().endswith('.py'):
                     mod_name = file[:-3].lower()
@@ -46,15 +49,19 @@ def get_all_coverage_modules(app_module):
     return mod_list
 
 def run_tests(test_labels, verbosity=1, interactive=True,
-        extra_tests=[]):
+        extra_tests=[], nodatabase=False):
     """
     Test runner which displays a code coverage report at the end of the
     run.
     """
     coverage.use_cache(0)
     coverage.start()
-    results = django_test_runner(test_labels, verbosity, interactive, 
-        extra_tests)
+    if nodatabase:
+        results = nodatabase_run_tests(test_labels, verbosity, interactive,
+            extra_tests)
+    else:
+        results = django_test_runner(test_labels, verbosity, interactive,
+            extra_tests)
     coverage.stop()
 
     coverage_modules = []
