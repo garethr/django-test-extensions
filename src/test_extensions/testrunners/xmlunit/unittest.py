@@ -784,7 +784,7 @@ class XmlTextTestRunner:
 
     def _openOutputFile(self, fileName):
         
-        if not os.path.isdir(os.path.join("temp", "xml")): os.mkdir(os.path.join("temp", "xml"))
+        if not os.path.isdir(os.path.join("temp", "xml")): os.makedirs(os.path.join("temp", "xml"))
         
         self.outputFileName = 'temp/xml/test_output.xml'
         self.output = open(self.outputFileName,'w')
