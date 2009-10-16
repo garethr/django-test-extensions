@@ -22,7 +22,7 @@ h2. Code Coverage
 
 If you want to know what code is being run when you run your test suite then codecoverage is for you. These two flags use two different third party libraries to calculate coverage statistics. The first dumps the results to stdout, the second creates a series of files displaying the results.
 
-<pre>python manage.py test --coverage<pre>
+<pre>python manage.py test --coverage</pre>
 <pre>python manage.py test --figleaf</pre>
 
 h2. No Database
