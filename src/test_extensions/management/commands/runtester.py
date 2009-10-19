@@ -23,7 +23,7 @@ def get_test_command():
     runtester.get_test_command = get_test_command
     """
 
-    from django.core.management.commands.test import Command as TestCommand
+    from test_extensions.management.commands.test import Command as TestCommand
     return TestCommand()
 
 def my_reloader_thread():
