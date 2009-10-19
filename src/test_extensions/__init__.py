@@ -34,7 +34,8 @@ def check_errors(fn):
     def wrapper(*args, **kwargs):
         try:
             fn(*args, **kwargs)
-        except (IndentationError, NameError, SyntaxError, TypeError), msg:
+        except (ImportError, IndentationError,
+                NameError, SyntaxError, TypeError):
             et, ev, tb = sys.exc_info()
 
             if getattr(ev, 'filename', None) is None:
