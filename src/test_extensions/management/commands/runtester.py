@@ -1,10 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.utils import autoreload
-from optparse import make_option
 import os
 import sys
 import time
-import traceback
 
 INPROGRESS_FILE = 'testing.inprogress'
 
