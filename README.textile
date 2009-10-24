@@ -12,25 +12,51 @@ Just add the project to your INSTALLED_APPS.
 
 Note that this application steals the test command from django, overriding it with extra toys. If another application in your INSTALLED_APPS does this too then the last one in the list will win. South migrations does this in order to use the django syncdb command for testing, which test_extensions does too. As of 0.4 test_extensions works with South, just as long as you include it after south in the list of installed apps.
 
-h2. XMLUnit 
+h2. Assertions
+
+See the examples directory in the src/test_extensions directory for details of a large number of useful assertions for testing django apps:
+
+* assert_response_contains
+* assert_response_doesnt_contain
+* assert_regex_contains
+* assert_render_matches
+* assert_code
+* assert_render
+* assert_render_matches
+* assert_doesnt_render
+* assert_render_contains
+* assert_render_doesnt_contain
+
+h2. Test Runners
+
+h3. XMLUnit 
 
 Sometimes it's nice to have a file reporting the results of a test run. Some applications such as CruiseControl can use this to display the results in a user interface.
 
 <pre>python manage.py test --xml</pre>
 
-h2. Code Coverage
+h3. Code Coverage
 
 If you want to know what code is being run when you run your test suite then codecoverage is for you. These two flags use two different third party libraries to calculate coverage statistics. The first dumps the results to stdout, the second creates a series of files displaying the results.
 
 <pre>python manage.py test --coverage</pre>
 <pre>python manage.py test --figleaf</pre>
 
-h2. No Database
+h3. No Database
 
 Sometimes your don't want the overhead of setting up a database during testing, probably because your application just doesn't use it.
 
 <pre>python manage.py test --nodb</pre>
 <pre>python manage.py test --nodb --coverage</pre>
+
+h2. Local Continuous Integration Command
+
+Thanks to Roberto Aguilar (http://github.com/rca) for providing a auto-reloading version of the test runner. Run the runtester command and it should run your test suite whenever you change a file (similar to how runserver reloads the server each time you change something.)
+
+See "this thread":http://groups.google.com/group/django-developers/browse_thread/thread/ac991410674c195d/f7179acc65e686cc
+ from the Django Developer list of more information and discussion. 
+
+<pre>python manage.py runtester</pre>
 
 h2. Licence
 

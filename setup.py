@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "django-test-extensions",
-    version = "0.5",
+    version = "0.7",
     author = "Gareth Rushgrove",
     author_email = "gareth@morethanseven.net",
     url = "http://github.com/garethr/django-test-extensions/",
