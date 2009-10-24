@@ -53,8 +53,7 @@ h2. Local Continuous Integration Command
 
 Thanks to Roberto Aguilar (http://github.com/rca) for providing a auto-reloading version of the test runner. Run the runtester command and it should run your test suite whenever you change a file (similar to how runserver reloads the server each time you change something.)
 
-See "this thread":http://groups.google.com/group/django-developers/browse_thread/thread/ac991410674c195d/f7179acc65e686cc
- from the Django Developer list of more information and discussion. 
+See "this thread":http://groups.google.com/group/django-developers/browse_thread/thread/ac991410674c195d/f7179acc65e686cc from the Django Developer list of more information and discussion. 
 
 <pre>python manage.py runtester</pre>
 
