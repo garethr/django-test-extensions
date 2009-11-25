@@ -1,5 +1,6 @@
 # Test classes inherit from the Django TestCase
 from common import Common
+import re
 
 # needed to login to the admin
 from django.contrib.auth.models import User
