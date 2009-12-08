@@ -54,6 +54,7 @@ def run_tests(test_labels, verbosity=1, interactive=True,
     Test runner which displays a code coverage report at the end of the
     run.
     """
+    test_labels = test_labels or getattr(settings, "TEST_APPS", None)
     coverage.use_cache(0)
     coverage.start()
     if nodatabase:
