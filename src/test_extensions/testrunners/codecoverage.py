@@ -5,8 +5,18 @@ from inspect import getmembers, ismodule
 from django.conf import settings
 from django.test.simple import run_tests as django_test_runner
 from django.db.models import get_app, get_apps
+from django.utils.functional import curry
 
 from nodatabase import run_tests as nodatabase_run_tests
+
+def is_wanted_module(mod):
+    for exclude in getattr(settings, "COVERAGE_EXCLUDE_MODULES", []):
+        if exclude.endswith("*"):
+            if mod.__name__.startswith(exclude[:-1]):
+                return False
+        if mod.__name__ == exclude:
+            return False
+    return True
 
 def get_coverage_modules(app_module):
     """
@@ -55,15 +65,17 @@ def run_tests(test_labels, verbosity=1, interactive=True,
     run.
     """
     test_labels = test_labels or getattr(settings, "TEST_APPS", None)
-    coverage.use_cache(0)
-    coverage.start()
+    cover_branch = getattr(settings, "COVERAGE_BRANCH_COVERAGE", False)
+    cov = coverage.coverage(branch=cover_branch, cover_pylib=False)
+    cov.use_cache(0)
+    cov.start()
     if nodatabase:
         results = nodatabase_run_tests(test_labels, verbosity, interactive,
             extra_tests)
     else:
         results = django_test_runner(test_labels, verbosity, interactive,
             extra_tests)
-    coverage.stop()
+    cov.stop()
 
     coverage_modules = []
     if test_labels:
@@ -77,7 +89,14 @@ def run_tests(test_labels, verbosity=1, interactive=True,
         for app in get_apps():
             coverage_modules.extend(get_all_coverage_modules(app))
 
-    if coverage_modules:
-        coverage.report(coverage_modules, show_missing=1)
+    morfs = filter(is_wanted_module, coverage_modules)
+
+    report_methd = cov.report
+    if getattr(settings, "COVERAGE_HTML_REPORT", False) or \
+            os.environ.get("COVERAGE_HTML_REPORT"):
+        output_dir = getattr(settings, "COVERAGE_HTML_DIRECTORY", "covhtml")
+        report_method = curry(cov.html_report, directory=output_dir)
+
+    morfs and report_method(morfs=morfs)
 
     return results
