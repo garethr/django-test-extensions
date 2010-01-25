@@ -73,6 +73,8 @@ class DjangoCommon(Common):
         self.assertTrue(disposition != None, pattern + ' not found in ' + string)
 
     def deny_regex_contains(self, pattern, slug):
+        'Deny that the given regular expression pattern matches a string'
+
         r = re.compile(pattern)
 
         self.assertEqual( None,
