@@ -65,7 +65,7 @@ class Common(TestCase):
         "Assert that one value (the hasystack) does not contain another value (the needle)"
         return self.assert_(needle not in haystack, "Content should not contain `%s' but does:\n%s" % (needle, haystack))
 
-    def deny_contain(self, needle, haystack):
+    def deny_contains(self, needle, haystack):
         "Assert that one value (the hasystack) does not contain another value (the needle)"
         return self.assert_(needle not in haystack, "Content should not contain `%s' but does:\n%s" % (needle, haystack))
 
