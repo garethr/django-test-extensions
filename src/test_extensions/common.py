@@ -13,6 +13,8 @@ from BeautifulSoup import BeautifulSoup as Soup
 # needed to login to the admin
 from django.contrib.auth.models import User
 
+from django.utils.encoding import smart_str
+
 class Common(TestCase):
     """
     This class contains a number of custom assertions which
@@ -59,14 +61,28 @@ class Common(TestCase):
         "Assert that one value (the hasystack) contains another value (the needle)"
         return self.assert_(needle in haystack, "Content should contain `%s' but doesn't:\n%s" % (needle, haystack))
 
-    def assert_doesnt_contain(self, needle, haystack):
+    def assert_doesnt_contain(self, needle, haystack):  #  CONSIDER  deprecate me for deny_contains
         "Assert that one value (the hasystack) does not contain another value (the needle)"
         return self.assert_(needle not in haystack, "Content should not contain `%s' but does:\n%s" % (needle, haystack))
 
-    def assert_regex_contains(self, pattern, string, flags=None):  #  TODO  get dry with django_common's clones of this!!!
+    def deny_contain(self, needle, haystack):
+        "Assert that one value (the hasystack) does not contain another value (the needle)"
+        return self.assert_(needle not in haystack, "Content should not contain `%s' but does:\n%s" % (needle, haystack))
+
+    def assert_regex_contains(self, pattern, string, flags=None):
         "Assert that the given regular expression matches the string"
         flags = flags or 0
-        self.assertTrue(re.search(pattern, string, flags) != None)
+        disposition = re.search(pattern, string, flags)
+        self.assertTrue(disposition != None, pattern + ' not found in ' + string)
+
+    def deny_regex_contains(self, pattern, slug):
+        'Deny that the given regular expression pattern matches a string'
+
+        r = re.compile(pattern)
+
+        self.assertEqual( None,
+                          r.search(smart_str(slug)),
+                          pattern + ' should not match ' + smart_str(slug) )
 
     def assert_count(self, expected, model):
         "Assert that their are the expected number of instances of a given model"
@@ -114,3 +130,40 @@ class Common(TestCase):
             assert(True)
         except AttributeError:
             assert(False)
+
+    def _xml_to_tree(self, xml):
+        from lxml import etree
+        self._xml = xml
+
+        try:
+            if '<html' in xml[:200]:
+                return etree.HTML(xml)
+            else:
+                return etree.XML(xml)
+
+        except ValueError:  #  TODO  don't rely on exceptions for normal control flow
+            tree = xml
+            self._xml = str(tree)  #  CONSIDER  does this reconstitute the nested XML ?
+            return tree
+
+    def assert_xml(self, xml, xpath, **kw):
+        'Check that a given extent of XML or HTML contains a given XPath, and return its first node'
+
+        tree = self._xml_to_tree(xml)
+        nodes = tree.xpath(xpath)
+        self.assertTrue(len(nodes) > 0, xpath + ' not found in ' + self._xml)
+        node = nodes[0]
+        if kw.get('verbose', False):  self.reveal_xml(node)  #  "here have ye been? What have ye seen?"--Morgoth
+        return node
+
+    def reveal_xml(self, node):
+        'Spews an XML node as source, for diagnosis'
+
+        print etree.tostring(node, pretty_print=True)  #  CONSIDER  does pretty_print work? why not?
+
+    def deny_xml(self, xml, xpath):
+        'Check that a given extent of XML or HTML does not contain a given XPath'
+
+        tree = self._xml_to_tree(xml)
+        nodes = tree.xpath(xpath)
+        self.assertEqual(0, len(nodes), xpath + ' should not appear in ' + self._xml)

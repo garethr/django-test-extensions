@@ -66,22 +66,6 @@ class DjangoCommon(Common):
         "Assert that a response object does not contain a given string"
         self.assert_(fragment not in response.content, "Response should not contain `%s' but does:\n%s" % (fragment, response.content))
 
-    def assert_regex_contains(self, pattern, string, flags=None):
-        "Assert that the given regular expression matches the string"
-        flags = flags or 0
-        disposition = re.search(pattern, string, flags)
-        self.assertTrue(disposition != None, pattern + ' not found in ' + string)
-
-    def deny_regex_contains(self, pattern, slug):
-        'Deny that the given regular expression pattern matches a string'
-
-        r = re.compile(pattern)
-
-        self.assertEqual( None,
-                          r.search(smart_str(slug)),
-                          pattern + ' should not match ' + smart_str(slug) )
-
-
     def assert_render_matches(self, template, match_regexp, vars={}):
         "Assert than the output from rendering a given template with a given context matches a given regex"
         r = re.compile(match_regexp)
