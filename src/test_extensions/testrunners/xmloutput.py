@@ -8,10 +8,10 @@ from django.utils.html import escape
 
 def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     setup_test_environment()
-    
-    settings.DEBUG = False    
+
+    settings.DEBUG = False
     suite = unittest.TestSuite()
-    
+
     if test_labels:
         for label in test_labels:
             if '.' in label:
@@ -22,7 +22,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     else:
         for app in get_apps():
             suite.addTest(build_suite(app))
-    
+
     for test in extra_tests:
         suite.addTest(test)
 
@@ -31,9 +31,9 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     connection.creation.create_test_db(verbosity, autoclobber=not interactive)
     result = XMLTestRunner(verbosity=verbosity).run(suite)
     connection.creation.destroy_test_db(old_name, verbosity)
-    
+
     teardown_test_environment()
-    
+
     return len(result.failures) + len(result.errors)
 
 
@@ -64,10 +64,18 @@ class _XmlTextTestResult(unittest.TestResult):
         else:
             return str(test)
 
-    def startTest(self, test):
+    def startTest(self, test):  #  CONSIDER  why are there 2 startTests in here?
         self._startTime = time.time()
         TestResult.startTest(self, test)
         self.stream.write('<testcase classname="%s' % test.__class__.__name__ + '" name="%s' % test.id().split('.')[-1] + '"')
+        desc = test.shortDescription()
+
+        if desc:
+            print desc
+            desc = desc.replace('"', '&quot;'). \
+                        replace('<', '&lt;').  \
+                        replace('>', '&gt;')
+            self.stream.write(' desc="%s"' % desc)
 
     def stopTest(self, test):
         stopTime = time.time()
