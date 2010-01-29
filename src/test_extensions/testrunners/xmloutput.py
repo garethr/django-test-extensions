@@ -66,6 +66,7 @@ class _XmlTextTestResult(unittest.TestResult):
 
     def startTest(self, test):  #  CONSIDER  why are there 2 startTests in here?
         self._startTime = time.time()
+        test._extraXML = ''
         TestResult.startTest(self, test)
         self.stream.write('<testcase classname="%s' % test.__class__.__name__ + '" name="%s' % test.id().split('.')[-1] + '"')
         desc = test.shortDescription()
@@ -94,6 +95,10 @@ class _XmlTextTestResult(unittest.TestResult):
                 assert(False)
             self.stream.write('</testcase>')
         self._errorsAndFailures = ""
+
+        if test._extraXML != '':
+            print test._extraXML
+            self.stream.write(test._extraXML)
 
     def addSuccess(self, test):
         TestResult.addSuccess(self, test)
