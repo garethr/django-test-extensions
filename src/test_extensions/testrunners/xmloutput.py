@@ -72,10 +72,10 @@ class _XmlTextTestResult(unittest.TestResult):
         desc = test.shortDescription()
 
         if desc:
-            print desc
             desc = desc.replace('"', '&quot;'). \
                         replace('<', '&lt;').  \
                         replace('>', '&gt;')
+
             self.stream.write(' desc="%s"' % desc)
 
     def stopTest(self, test):
