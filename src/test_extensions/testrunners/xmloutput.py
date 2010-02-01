@@ -97,7 +97,6 @@ class _XmlTextTestResult(unittest.TestResult):
         self._errorsAndFailures = ""
 
         if test._extraXML != '':
-            print test._extraXML
             self.stream.write(test._extraXML)
 
     def addSuccess(self, test):
