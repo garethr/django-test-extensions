@@ -159,6 +159,7 @@ class Common(TestCase):
     def reveal_xml(self, node):
         'Spews an XML node as source, for diagnosis'
 
+        from lxml import etree
         print etree.tostring(node, pretty_print=True)  #  CONSIDER  does pretty_print work? why not?
 
     def deny_xml(self, xml, xpath):
