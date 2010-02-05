@@ -111,7 +111,8 @@ class DjangoCommon(Common):
         return mails
 
     def assert_model_changes(self, mod, item, frum, too, lamb):
-        self.assertEqual(frum, mod.__dict__[item])  #  TODO  better diagnostics
+        self.assertEqual(frum, mod.__dict__[item])  #  TODO  better diagnostics, and use with notation
         lamb()
         mod = mod.__class__.objects.get(pk=mod.pk)
         self.assertEqual(too, mod.__dict__[item])
+        return mod
