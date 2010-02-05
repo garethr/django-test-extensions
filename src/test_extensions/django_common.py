@@ -111,8 +111,19 @@ class DjangoCommon(Common):
         return mails
 
     def assert_model_changes(self, mod, item, frum, too, lamb):
-        self.assertEqual(frum, mod.__dict__[item])  #  TODO  better diagnostics, and use with notation
+        source = open(lamb.func_code.co_filename, 'r').readlines()[lamb.func_code.co_firstlineno - 1]
+        source = source.replace('lambda:', '').strip()
+        model  = str(mod.__class__).replace("'>", '').split('.')[-1]
+
+        should = '%s.%s should equal `%s` before your activation line, `%s`' % \
+                  (model, item, frum, source)
+
+        self.assertEqual(frum, mod.__dict__[item], should)
         lamb()
         mod = mod.__class__.objects.get(pk=mod.pk)
-        self.assertEqual(too, mod.__dict__[item])
+
+        should = '%s.%s should equal `%s` after your activation line, `%s`' % \
+                  (model, item, too, source)
+
+        self.assertEqual(too, mod.__dict__[item], should)
         return mod
