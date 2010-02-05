@@ -169,8 +169,3 @@ class Common(TestCase):
         nodes = tree.xpath(xpath)
         self.assertEqual(0, len(nodes), xpath + ' should not appear in ' + self._xml)
 
-    def assert_model_changes(self, mod, item, frum, too, lamb):
-        self.assertEqual(frum, mod.__dict__[item])  #  TODO  better diagnostics
-        lamb()
-        mod = mod.__class__.objects.get(pk=mod.pk)
-        self.assertEqual(too, mod.__dict__[item])

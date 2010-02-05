@@ -100,3 +100,18 @@ class DjangoCommon(Common):
     def assert_render_doesnt_contain(self, expected, template, **kwargs):
         "Asserts than a given template and context rendering does not contain a given fragment"
         self.assert_doesnt_contain(expected, self.render(template, **kwargs))
+
+    def assert_mail(self, funk):
+        from django.core import mail
+
+        previous_mails = len(mail.outbox)
+        funk()
+        mails = mail.outbox[ previous_mails : ]
+        assert [] != mails
+        return mails
+
+    def assert_model_changes(self, mod, item, frum, too, lamb):
+        self.assertEqual(frum, mod.__dict__[item])  #  TODO  better diagnostics
+        lamb()
+        mod = mod.__class__.objects.get(pk=mod.pk)
+        self.assertEqual(too, mod.__dict__[item])
