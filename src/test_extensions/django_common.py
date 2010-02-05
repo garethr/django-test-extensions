@@ -103,10 +103,11 @@ class DjangoCommon(Common):
 
     def assert_mail(self, funk):
         from django.core import mail
-
+        print dir(mail.outbox), mail.outbox.__class__
         previous_mails = len(mail.outbox)
         funk()
         mails = mail.outbox[ previous_mails : ]
+        print mails.__class__
         assert [] != mails
         if len(mails) == 1:  return mails[0]
         return mails
