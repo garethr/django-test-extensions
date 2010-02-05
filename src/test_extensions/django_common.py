@@ -108,6 +108,7 @@ class DjangoCommon(Common):
         funk()
         mails = mail.outbox[ previous_mails : ]
         assert [] != mails
+        if len(mails) == 1:  return mails[0]
         return mails
 
     def assert_model_changes(self, mod, item, frum, too, lamb):
