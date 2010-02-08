@@ -139,7 +139,6 @@ class Common(TestCase):
             if '<html' in xml[:200]:
                 parser = etree.HTMLParser(recover=False)
                 return etree.HTML(xml, parser)
-                return etree.HTML(xml)
             else:
                 return etree.XML(xml)
 
