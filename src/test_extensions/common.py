@@ -73,7 +73,7 @@ class Common(TestCase):
         "Assert that the given regular expression matches the string"
         flags = flags or 0
         disposition = re.search(pattern, string, flags)
-        self.assertTrue(disposition != None, pattern + ' not found in ' + string)
+        self.assertTrue(disposition != None, smart_str(pattern) + ' not found in ' + smart_str(string))
 
     def deny_regex_contains(self, pattern, slug):
         'Deny that the given regular expression pattern matches a string'
