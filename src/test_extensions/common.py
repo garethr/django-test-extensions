@@ -137,6 +137,8 @@ class Common(TestCase):
 
         try:
             if '<html' in xml[:200]:
+                parser = etree.HTMLParser(recover=False)
+                return etree.HTML(xml, parser)
                 return etree.HTML(xml)
             else:
                 return etree.XML(xml)
@@ -168,4 +170,3 @@ class Common(TestCase):
         tree = self._xml_to_tree(xml)
         nodes = tree.xpath(xpath)
         self.assertEqual(0, len(nodes), xpath + ' should not appear in ' + self._xml)
-
