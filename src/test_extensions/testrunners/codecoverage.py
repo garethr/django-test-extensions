@@ -73,6 +73,8 @@ def run_tests(test_labels, verbosity=1, interactive=True,
         results = nodatabase_run_tests(test_labels, verbosity, interactive,
             extra_tests)
     else:
+        from django.db import connection
+        connection.creation.destroy_test_db = lambda *a, **k: None
         results = django_test_runner(test_labels, verbosity, interactive,
             extra_tests)
     cov.stop()
@@ -96,6 +98,8 @@ def run_tests(test_labels, verbosity=1, interactive=True,
             os.environ.get("COVERAGE_HTML_REPORT"):
         output_dir = getattr(settings, "COVERAGE_HTML_DIRECTORY", "covhtml")
         report_method = curry(cov.html_report, directory=output_dir)
+    else:
+        report_method = cov.report
 
     morfs and report_method(morfs=morfs)
 
