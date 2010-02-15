@@ -10,13 +10,41 @@ from django.utils.functional import curry
 from nodatabase import run_tests as nodatabase_run_tests
 
 def is_wanted_module(mod):
-    for exclude in getattr(settings, "COVERAGE_EXCLUDE_MODULES", []):
+    included = getattr(settings, "COVERAGE_INCLUDE_MODULES", [])
+    excluded = getattr(settings, "COVERAGE_EXCLUDE_MODULES", [])
+    
+    marked_to_include = None 
+
+    for exclude in excluded:
         if exclude.endswith("*"):
             if mod.__name__.startswith(exclude[:-1]):
-                return False
-        if mod.__name__ == exclude:
-            return False
-    return True
+                marked_to_include = False
+        elif mod.__name__ == exclude:
+            marked_to_include = False
+    
+    for include in included:
+        if include.endswith("*"):
+            if mod.__name__.startswith(include[:-1]):
+                marked_to_include = True
+        elif mod.__name__ == include:
+            marked_to_include = True
+    
+    # marked_to_include=None handles not user-defined states
+    if marked_to_include is None:
+        if included and excluded:
+            # User defined exactly what they want, so exclude other
+            marked_to_include = False
+        elif excluded:
+            # User could define what the want not, so include other.
+            marked_to_include = True
+        elif included:
+            # User enforced what they want, so exclude other
+            marked_to_include = False
+        else:
+            # Usar said nothing, so include anything
+            marked_to_include = True
+
+    return marked_to_include
 
 def get_coverage_modules(app_module):
     """
