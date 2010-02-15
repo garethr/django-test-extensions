@@ -126,6 +126,8 @@ def run_tests(test_labels, verbosity=1, interactive=True,
             os.environ.get("COVERAGE_HTML_REPORT"):
         output_dir = getattr(settings, "COVERAGE_HTML_DIRECTORY", "covhtml")
         report_method = curry(cov.html_report, directory=output_dir)
+        print >>sys.stdout
+        print >>sys.stdout, "Coverage HTML reports were output to '%s'" %output_dir
     else:
         report_method = cov.report
 
