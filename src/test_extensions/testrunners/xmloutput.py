@@ -67,15 +67,13 @@ class _XmlTextTestResult(unittest.TestResult):
     def startTest(self, test):  #  CONSIDER  why are there 2 startTests in here?
         self._startTime = time.time()
         test._extraXML = ''
+        test._extraAssertions = []
         TestResult.startTest(self, test)
         self.stream.write('<testcase classname="%s' % test.__class__.__name__ + '" name="%s' % test.id().split('.')[-1] + '"')
         desc = test.shortDescription()
 
         if desc:
-            desc = desc.replace('"', '&quot;'). \
-                        replace('<', '&lt;').  \
-                        replace('>', '&gt;')
-
+            desc = _cleanHTML(desc)
             self.stream.write(' desc="%s"' % desc)
 
     def stopTest(self, test):
@@ -83,21 +81,31 @@ class _XmlTextTestResult(unittest.TestResult):
         deltaTime = stopTime - self._startTime
         TestResult.stopTest(self, test)
         self.stream.write(' time="%.3f"' % deltaTime)
-        if self._lastWas == 'success':
-            self.stream.write('/>')
-        else:
-            self.stream.write('>')
+        self.stream.write('>')
+        if self._lastWas != 'success':
             if self._lastWas == 'error':
                 self.stream.write(self._errorsAndFailures)
             elif self._lastWas == 'failure':
                 self.stream.write(self._errorsAndFailures)
             else:
                 assert(False)
-            self.stream.write('</testcase>')
+
+        seen = {}
+
+        for assertion in test._extraAssertions:
+            if not seen.has_key(assertion):
+                self._addAssertion(assertion[:64]) # :64 avoids tl;dr
+                seen[assertion] = True
+
+        self.stream.write('</testcase>')
         self._errorsAndFailures = ""
 
         if test._extraXML != '':
             self.stream.write(test._extraXML)
+
+    def _addAssertion(self, diagnostic):
+        diagnostic = _cleanHTML(diagnostic)
+        self.stream.write('<assert>' + diagnostic + '</assert>')
 
     def addSuccess(self, test):
         TestResult.addSuccess(self, test)
@@ -130,3 +138,8 @@ class _XmlTextTestResult(unittest.TestResult):
 
     def printErrorList(self, flavour, errors):
         assert False
+
+def _cleanHTML(whut):
+    return whut.replace('"', '&quot;'). \
+                replace('<', '&lt;').  \
+                replace('>', '&gt;')

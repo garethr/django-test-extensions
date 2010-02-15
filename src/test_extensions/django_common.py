@@ -76,7 +76,7 @@ class DjangoCommon(Common):
 
     def assert_code(self, response, code):
         "Assert that a given response returns a given HTTP status code"
-        self.assertEqual(code, response.status_code, "HTTP Response status code %d expected, but got %d" % (code, response.status_code))
+        self.assertEqual(code, response.status_code, "HTTP Response status code should be %d, and is %d" % (code, response.status_code))
 
     def assert_render(self, expected, template, **kwargs):
         "Asserts than a given template and context render a given fragment"
