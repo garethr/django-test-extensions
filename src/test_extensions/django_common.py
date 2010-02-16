@@ -78,6 +78,19 @@ class DjangoCommon(Common):
         "Assert that a given response returns a given HTTP status code"
         self.assertEqual(code, response.status_code, "HTTP Response status code should be %d, and is %d" % (code, response.status_code))
 
+    def assertNotContains(self, response, text, status_code=200):  # overrides Django's assertion, because all diagnostics should be stated positively!!!
+        """
+        Asserts that a response indicates that a page was retrieved
+        successfully, (i.e., the HTTP status code was as expected), and that
+        ``text`` doesn't occurs in the content of the response.
+        """
+        self.assertEqual(response.status_code, status_code,
+            "Retrieving page: Response code was %d (expected %d)'" %
+                (response.status_code, status_code))
+        text = smart_str(text, response._charset)
+        self.assertEqual(response.content.count(text),
+             0, "Response should not contain '%s'" % text)
+
     def assert_render(self, expected, template, **kwargs):
         "Asserts than a given template and context render a given fragment"
         self.assert_equal(expected, self.render(template, **kwargs))
