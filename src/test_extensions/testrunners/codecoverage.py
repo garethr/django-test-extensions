@@ -11,8 +11,14 @@ from nodatabase import run_tests as nodatabase_run_tests
 
 def is_wanted_module(mod):
     for exclude in getattr(settings, "COVERAGE_EXCLUDE_MODULES", []):
+        if exclude.startswith("*") and exclude.endswith("*"):
+            if exclude[1:-1] in mod.__name__:
+                return False
         if exclude.endswith("*"):
             if mod.__name__.startswith(exclude[:-1]):
+                return False
+        if exclude.startswith("*"):
+            if mod.__name__.endswith(exclude[1:]):
                 return False
         if mod.__name__ == exclude:
             return False
