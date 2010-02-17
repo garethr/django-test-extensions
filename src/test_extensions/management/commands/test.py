@@ -29,6 +29,10 @@ class Command(BaseCommand):
             help='Produce xml output for cruise control'),
         make_option('--nodb', action='store_true', dest='nodb', default=False,
             help='No database required for these tests'),
+        make_option('--failfast', action='store_true', dest='failfast',
+            default=False,
+            help='Tells Django to stop running the test suite after first failed test.'),
+
     )
     help = """Custom test command which allows for
         specifying different test runners."""
@@ -71,7 +75,7 @@ class Command(BaseCommand):
         test_module = __import__(test_module_name, {}, {}, test_path[-1])
         test_runner = getattr(test_module, test_path[-1])
 
-        failures = test_runner(test_labels, verbosity=verbosity,
+        failures = test_runner(test_labels, verbosity=verbosity, failfast=failfast,
                 interactive=interactive)
         if failures:
             sys.exit(failures)
