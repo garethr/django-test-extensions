@@ -49,6 +49,7 @@ class Command(BaseCommand):
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
+        failfast = options.get("failfast", False)
 
         # it's quite possible someone, lets say South, might have stolen
         # the syncdb command from django. For testing purposes we should
@@ -80,7 +81,17 @@ class Command(BaseCommand):
         test_module = __import__(test_module_name, {}, {}, test_path[-1])
         test_runner = getattr(test_module, test_path[-1])
 
-        failures = test_runner(test_labels, verbosity=verbosity, failfast=failfast,
-                interactive=interactive)
+        test_options = dict(verbosity=verbosity, interactive=interactive)
+        if failfast:
+            test_options["failfast"] = failfast
+
+        try:
+            failures = test_runner(test_labels, **test_options)
+        except TypeError, exc:
+            if "failfast" in str(exc):
+                raise NotImplementedError(
+                        "The --failfast option requires Django 1.2 or newer.")
+            raise
+
         if failures:
             sys.exit(failures)
