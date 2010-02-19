@@ -1,5 +1,5 @@
 import coverage
-import os
+import os, sys
 from inspect import getmembers, ismodule
 
 from django.conf import settings
@@ -87,16 +87,25 @@ def get_all_coverage_modules(app_module):
     return mod_list
 
 def run_tests(test_labels, verbosity=1, interactive=True,
-        extra_tests=[], nodatabase=False):
+        extra_tests=[], nodatabase=False, callgraph=False):
     """
     Test runner which displays a code coverage report at the end of the
     run.
     """
+
     test_labels = test_labels or getattr(settings, "TEST_APPS", None)
     cover_branch = getattr(settings, "COVERAGE_BRANCH_COVERAGE", False)
     cov = coverage.coverage(branch=cover_branch, cover_pylib=False)
     cov.use_cache(0)
     cov.start()
+    if callgraph:
+        try:
+            import pycallgraph
+            pycallgraph.start_trace()
+            pycallgraph_enabled = True
+        except ImportError:
+            pycallgraph_enabled = False
+
     if nodatabase:
         results = nodatabase_run_tests(test_labels, verbosity, interactive,
             extra_tests)
@@ -105,6 +114,9 @@ def run_tests(test_labels, verbosity=1, interactive=True,
         connection.creation.destroy_test_db = lambda *a, **k: None
         results = django_test_runner(test_labels, verbosity, interactive,
             extra_tests)
+    
+    if callgraph and pycallgraph_enabled:
+        pycallgraph.stop_trace()
     cov.stop()
 
     coverage_modules = []
@@ -126,8 +138,18 @@ def run_tests(test_labels, verbosity=1, interactive=True,
             os.environ.get("COVERAGE_HTML_REPORT"):
         output_dir = getattr(settings, "COVERAGE_HTML_DIRECTORY", "covhtml")
         report_method = curry(cov.html_report, directory=output_dir)
+        if callgraph and pycallgraph_enabled:
+            callgraph_path = output_dir + '/' + 'callgraph.png'
+            pycallgraph.make_dot_graph(callgraph_path)
+
         print >>sys.stdout
         print >>sys.stdout, "Coverage HTML reports were output to '%s'" %output_dir
+        if callgraph:
+            if pycallgraph_enabled:
+                print >>sys.stdout, "Call graph was output to '%s'" %callgraph_path
+            else:
+                print >>sys.stdout, "Call graph was not generated: Install 'pycallgraph' module to do so"
+
     else:
         report_method = cov.report
 

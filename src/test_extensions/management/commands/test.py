@@ -19,6 +19,9 @@ class Command(BaseCommand):
         make_option('--noinput', action='store_false', dest='interactive',
             default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
+        make_option('--callgraph', action='store_true', dest='callgraph',
+            default=False,
+            help='Generate execution call graph (slow!)'),
         make_option('--coverage', action='store_true', dest='coverage',
             default=False,
             help='Show coverage details'),
@@ -40,6 +43,7 @@ class Command(BaseCommand):
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
+        callgraph = options.get('callgraph', False)
 
         # it's quite possible someone, lets say South, might have stolen
         # the syncdb command from django. For testing purposes we should
@@ -70,8 +74,13 @@ class Command(BaseCommand):
             test_module_name = '.'
         test_module = __import__(test_module_name, {}, {}, test_path[-1])
         test_runner = getattr(test_module, test_path[-1])
+        
+        if options.get('coverage'):
+            failures = test_runner(test_labels, verbosity=verbosity,
+                    interactive=interactive, callgraph=callgraph)
+        else:
+            failures = test_runner(test_labels, verbosity=verbosity,
+                    interactive=interactive)
 
-        failures = test_runner(test_labels, verbosity=verbosity,
-                interactive=interactive)
         if failures:
             sys.exit(failures)
