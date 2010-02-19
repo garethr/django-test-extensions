@@ -2,17 +2,17 @@
 Test runner that doesn't use the database. Contributed by
 Bradley Wright <intranation.com>
 """
- 
+
 import os
 import unittest
 from glob import glob
- 
+
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.conf import settings
 from django.test.simple import *
- 
+
 import coverage
- 
+
 def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     """
     Run the unit tests for all the test labels in the provided list.
@@ -23,22 +23,22 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
         Run all the test methods in a given class
      - app
         Search for doctests and unittests in the named application.
- 
+
     When looking for tests, the test runner will look in the models and
     tests modules for the application.
-    
+
     A list of 'extra' tests may also be provided; these tests
     will be added to the test suite.
-    
+
     Returns the number of tests that failed.
     """
     setup_test_environment()
- 
+
     settings.DEBUG = False
     suite = unittest.TestSuite()
- 
+
     modules_to_cover = []
-     
+
     # if passed a list of tests...
     if test_labels:
         for label in test_labels:
@@ -61,16 +61,16 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
                 modules_to_cover.extend(new_files)
                 # actually test the file
                 suite.addTest(build_suite(app))
-    
+
     for test in extra_tests:
         suite.addTest(test)
- 
+
     result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
- 
+
     teardown_test_environment()
-  
+
     return len(result.failures) + len(result.errors)
-    
+
 def run_tests_with_coverage(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     """
     Run the unit tests for all the test labels in the provided list.

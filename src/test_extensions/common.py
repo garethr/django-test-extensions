@@ -50,16 +50,17 @@ class Common(TestCase):
     # Custom assertions
 
     def assert_equal(self, *args, **kwargs):
-        "Assert that two values are equal"
+        'Assert that two values are equal'
+
         return self.assertEqual(*args, **kwargs)
 
     def assert_not_equal(self, *args, **kwargs):
         "Assert that two values are not equal"
-        return not self.assertNotEqual(*args, **kwargs)
+        return not self.assertNotEqual(*args, **kwargs)  #  TODO  reflect me into the report!
 
     def assert_contains(self, needle, haystack):
         "Assert that one value (the hasystack) contains another value (the needle)"
-        return self.assert_(needle in haystack, "Content should contain `%s' but doesn't:\n%s" % (needle, haystack))
+        return self.assert_(needle in haystack, "Content should contain `%s' but doesn't:\n%s" % (needle, haystack))  #  TODO  reflect me into the report!
 
     def assert_doesnt_contain(self, needle, haystack):  #  CONSIDER  deprecate me for deny_contains
         "Assert that one value (the hasystack) does not contain another value (the needle)"
@@ -70,10 +71,11 @@ class Common(TestCase):
         return self.assert_(needle not in haystack, "Content should not contain `%s' but does:\n%s" % (needle, haystack))
 
     def assert_regex_contains(self, pattern, string, flags=None):
-        "Assert that the given regular expression matches the string"
+        'Assert that the given regular expression matches the string'
+
         flags = flags or 0
         disposition = re.search(pattern, string, flags)
-        self.assertTrue(disposition != None, smart_str(pattern) + ' not found in ' + smart_str(string))
+        self.assertTrue(disposition != None, repr(smart_str(pattern)) + ' should match ' + repr(smart_str(string)))
 
     def deny_regex_contains(self, pattern, slug):
         'Deny that the given regular expression pattern matches a string'

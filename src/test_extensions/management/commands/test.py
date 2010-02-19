@@ -5,6 +5,8 @@ from django.core import management
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+skippers = []
+
 class Command(BaseCommand):
     option_list = BaseCommand.option_list
 
@@ -29,6 +31,8 @@ class Command(BaseCommand):
             help='Produce xml output for cruise control'),
         make_option('--nodb', action='store_true', dest='nodb', default=False,
             help='No database required for these tests'),
+        #make_option('--skip', action='store', dest='skip', default=False,
+        #    help='Omit these applications from testing'),  #  TODO  require args if used
     )
     help = """Custom test command which allows for
         specifying different test runners."""
@@ -62,6 +66,8 @@ class Command(BaseCommand):
         else:
             test_runner_name = settings.TEST_RUNNER
 
+        # skippers = options.get('skip').split(',')  #  TODO  complain if no args
+
         test_path = test_runner_name.split('.')
         # Allow for Python 2.5 relative paths
         if len(test_path) > 1:
@@ -70,8 +76,10 @@ class Command(BaseCommand):
             test_module_name = '.'
         test_module = __import__(test_module_name, {}, {}, test_path[-1])
         test_runner = getattr(test_module, test_path[-1])
+        #print test_runner
+        # print test_runner.__file__
 
         failures = test_runner(test_labels, verbosity=verbosity,
-                interactive=interactive)
+                                    interactive=interactive) # , skip_apps=skippers)
         if failures:
             sys.exit(failures)
