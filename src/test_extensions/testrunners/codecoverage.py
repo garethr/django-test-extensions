@@ -97,28 +97,7 @@ def run_tests(test_labels, verbosity=1, interactive=True,
     cover_branch = getattr(settings, "COVERAGE_BRANCH_COVERAGE", False)
     cov = coverage.coverage(branch=cover_branch, cover_pylib=False)
     cov.use_cache(0)
-    cov.start()
-    if callgraph:
-        try:
-            import pycallgraph
-            pycallgraph.start_trace()
-            pycallgraph_enabled = True
-        except ImportError:
-            pycallgraph_enabled = False
-
-    if nodatabase:
-        results = nodatabase_run_tests(test_labels, verbosity, interactive,
-            extra_tests)
-    else:
-        from django.db import connection
-        connection.creation.destroy_test_db = lambda *a, **k: None
-        results = django_test_runner(test_labels, verbosity, interactive,
-            extra_tests)
-    
-    if callgraph and pycallgraph_enabled:
-        pycallgraph.stop_trace()
-    cov.stop()
-
+     
     coverage_modules = []
     if test_labels:
         for label in test_labels:
@@ -133,6 +112,48 @@ def run_tests(test_labels, verbosity=1, interactive=True,
 
     morfs = filter(is_wanted_module, coverage_modules)
 
+    if callgraph:
+        try:
+            import pycallgraph
+            #_include = [i.__name__ for i in coverage_modules]
+            _included = getattr(settings, "COVERAGE_INCLUDE_MODULES", [])
+            _excluded = getattr(settings, "COVERAGE_EXCLUDE_MODULES", [])
+
+            _included = [i.strip('*')+'*' for i in _included]
+            _excluded = [i.strip('*')+'*' for i in _included]
+
+            _filter_func = pycallgraph.GlobbingFilter(
+                include=_included or ['*'],
+                #include=['lotericas.*'],
+                #exclude=[],
+                #max_depth=options.max_depth,
+            )
+
+            pycallgraph_enabled = True
+        except ImportError:
+            pycallgraph_enabled = False
+    else:
+        pycallgraph_enabled = False
+
+    cov.start()
+    
+    if pycallgraph_enabled:
+        pycallgraph.start_trace(filter_func=_filter_func)
+
+    if nodatabase:
+        results = nodatabase_run_tests(test_labels, verbosity, interactive,
+            extra_tests)
+    else:
+        from django.db import connection
+        connection.creation.destroy_test_db = lambda *a, **k: None
+        results = django_test_runner(test_labels, verbosity, interactive,
+            extra_tests)
+    
+    if callgraph and pycallgraph_enabled:
+        pycallgraph.stop_trace()
+
+    cov.stop()
+    
     report_methd = cov.report
     if getattr(settings, "COVERAGE_HTML_REPORT", False) or \
             os.environ.get("COVERAGE_HTML_REPORT"):
