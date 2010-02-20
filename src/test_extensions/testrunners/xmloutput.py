@@ -94,7 +94,7 @@ class _XmlTextTestResult(unittest.TestResult):
 
         for assertion in test._extraAssertions:
             if not seen.has_key(assertion):
-                self._addAssertion(assertion[:110]) # :110 avoids tl;dr
+                self._addAssertion(assertion[:110]) # :110 avoids tl;dr TODO use a lexical truncator
                 seen[assertion] = True
 
         self.stream.write('</testcase>')
