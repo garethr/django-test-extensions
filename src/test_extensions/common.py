@@ -154,7 +154,7 @@ class Common(TestCase):
 
         tree = self._xml_to_tree(xml)
         nodes = tree.xpath(xpath)
-        self.assertTrue(len(nodes) > 0, xpath + ' not found in ' + self._xml)
+        self.assertTrue(len(nodes) > 0, xpath + ' should match ' + self._xml)
         node = nodes[0]
         if kw.get('verbose', False):  self.reveal_xml(node)  #  "here have ye been? What have ye seen?"--Morgoth
         return node
