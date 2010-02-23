@@ -3,6 +3,7 @@ from optparse import make_option
 
 from django.core import management
 from django.conf import settings
+from django.db.models import get_app, get_apps
 from django.core.management.base import BaseCommand
 
 skippers = []
@@ -82,8 +83,8 @@ class Command(BaseCommand):
         if hasattr(settings, 'SKIP_TESTS'):
             if not test_labels:
                 test_labels = list()
-                for app in settings.INSTALLED_APPS:
-                    test_labels.append(app.split('.')[-1])
+                for app in get_apps():
+                    test_labels.append(app.__name__.split('.')[-2])
             for app in settings.SKIP_TESTS:
                 try:
                     test_labels.remove(app)
