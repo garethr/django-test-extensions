@@ -79,6 +79,16 @@ class Command(BaseCommand):
         #print test_runner
         # print test_runner.__file__
 
+        if hasattr(settings, 'SKIP_TESTS'):
+            if not test_labels:
+                test_labels = list()
+                for app in settings.INSTALLED_APPS:
+                    test_labels.append(app.split('.')[-1])
+            for app in settings.SKIP_TESTS:
+                try:
+                    test_labels.remove(app)
+                except ValueError:
+                    pass
         failures = test_runner(test_labels, verbosity=verbosity,
                                     interactive=interactive) # , skip_apps=skippers)
         if failures:
