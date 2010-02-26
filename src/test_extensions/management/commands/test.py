@@ -87,6 +87,7 @@ class Command(BaseCommand):
                     test_labels.append(app.__name__.split('.')[-2])
             for app in settings.SKIP_TESTS:
                 try:
+                    test_labels = list(test_labels)
                     test_labels.remove(app)
                 except ValueError:
                     pass
