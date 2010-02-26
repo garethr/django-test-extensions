@@ -58,9 +58,11 @@ class Common(TestCase):
         "Assert that two values are not equal"
         return not self.assertNotEqual(*args, **kwargs)  #  TODO  reflect me into the report!
 
-    def assert_contains(self, needle, haystack):
-        "Assert that one value (the hasystack) contains another value (the needle)"
-        return self.assert_(needle in haystack, "Content should contain `%s' but doesn't:\n%s" % (needle, haystack))  #  TODO  reflect me into the report!
+    def assert_contains(self, needle, haystack, diagnostic=''):
+        'Assert that one value (the hasystack) contains another value (the needle)'
+        diagnostic = diagnostic + "\nContent should contain `%s' but doesn't:\n%s" % (needle, haystack)
+        diagnostic = diagnostic.strip()
+        return self.assert_(needle in haystack, diagnostic)  #  TODO  reflect me into the report!
 
     def assert_doesnt_contain(self, needle, haystack):  #  CONSIDER  deprecate me for deny_contains
         "Assert that one value (the hasystack) does not contain another value (the needle)"
