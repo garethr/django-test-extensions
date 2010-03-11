@@ -138,18 +138,16 @@ class Common(TestCase):
     def _xml_to_tree(self, xml):
         from lxml import etree
         self._xml = xml
+        
+        if not isinstance(xml, basestring):
+            self._xml = str(xml)  #  TODO  tostring
+            return xml
 
-        try:
-            if '<html' in xml[:200]:
-                parser = etree.HTMLParser(recover=False)
-                return etree.HTML(xml, parser)
-            else:
-                return etree.XML(xml)
-
-        except ValueError:  #  TODO  don't rely on exceptions for normal control flow
-            tree = xml
-            self._xml = str(tree)  #  CONSIDER  does this reconstitute the nested XML ?
-            return tree
+        if '<html' in xml[:200]:
+            parser = etree.HTMLParser(recover=False)
+            return etree.HTML(str(xml), parser)
+        else:
+            return etree.XML(str(xml))
 
     def assert_xml(self, xml, xpath, **kw):
         'Check that a given extent of XML or HTML contains a given XPath, and return its first node'
