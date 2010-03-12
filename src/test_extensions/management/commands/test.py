@@ -91,7 +91,11 @@ class Command(BaseCommand):
                     test_labels.remove(app)
                 except ValueError:
                     pass
-        failures = test_runner(test_labels, verbosity=verbosity,
-                                    interactive=interactive) # , skip_apps=skippers)
+        try:
+            failures = test_runner(test_labels, verbosity=verbosity,
+                                        interactive=interactive) # , skip_apps=skippers)
+        except TypeError: #Django 1.2
+            failures = test_runner(verbosity=verbosity, #TODO extend django.test.simple.DjangoTestSuiteRunner
+                                   interactive=interactive).run_tests(test_labels)
         if failures:
             sys.exit(failures)
