@@ -115,6 +115,12 @@ class DjangoCommon(Common):
         self.assert_doesnt_contain(expected, self.render(template, **kwargs))
 
     def assert_mail(self, funk):
+        '''
+        checks that the called block shouts out to the world
+
+        returns either a single mail object or a list of more than one
+        '''
+
         from django.core import mail
         previous_mails = len(mail.outbox)
         funk()
@@ -122,6 +128,15 @@ class DjangoCommon(Common):
         assert [] != mails, 'the called block produced no mails'
         if len(mails) == 1:  return mails[0]
         return mails
+
+    def deny_mail(self, funk):
+        '''checks that the called block keeps its opinions to itself'''
+
+        from django.core import mail
+        previous_mails = len(mail.outbox)
+        funk()
+        mails = mail.outbox[ previous_mails : ]
+        assert [] == mails, 'the called block should produce no mails'
 
     def assert_model_changes(self, mod, item, frum, too, lamb):
         source = open(lamb.func_code.co_filename, 'r').readlines()[lamb.func_code.co_firstlineno - 1]
