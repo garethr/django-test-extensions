@@ -135,24 +135,25 @@ class Common(TestCase):
         except AttributeError:
             assert(False)
 
-    def _xml_to_tree(self, xml):
+    def _xml_to_tree(self, xml, forgiving=False):
         from lxml import etree
         self._xml = xml
-        
+
         if not isinstance(xml, basestring):
             self._xml = str(xml)  #  TODO  tostring
             return xml
 
         if '<html' in xml[:200]:
-            parser = etree.HTMLParser(recover=False)
+            parser = etree.HTMLParser(recover=forgiving)
             return etree.HTML(str(xml), parser)
         else:
+            parser = etree.XMLParser(recover=forgiving)
             return etree.XML(str(xml))
 
     def assert_xml(self, xml, xpath, **kw):
         'Check that a given extent of XML or HTML contains a given XPath, and return its first node'
 
-        tree = self._xml_to_tree(xml)
+        tree = self._xml_to_tree(xml, forgiving=kw.get('forgiving', False))
         nodes = tree.xpath(xpath)
         self.assertTrue(len(nodes) > 0, xpath + ' should match ' + self._xml)
         node = nodes[0]
