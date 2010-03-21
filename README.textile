@@ -37,9 +37,10 @@ Sometimes it's nice to have a file reporting the results of a test run. Some app
 
 h3. Code Coverage
 
-If you want to know what code is being run when you run your test suite then codecoverage is for you. These two flags use two different third party libraries to calculate coverage statistics. The first dumps the results to stdout, the second creates a series of files displaying the results.
+If you want to know what code is being run when you run your test suite then codecoverage is for you. These two flags use two different third party libraries to calculate coverage statistics. The first dumps the results to stdout, --xmlcoverage creates a cobertura-compatible xml output, and the last one creates a series of files displaying the results.
 
 <pre>python manage.py test --coverage</pre>
+<pre>python manage.py test --xmlcoverage</pre>
 <pre>python manage.py test --figleaf</pre>
 
 h3. No Database
@@ -48,6 +49,7 @@ Sometimes your don't want the overhead of setting up a database during testing, 
 
 <pre>python manage.py test --nodb</pre>
 <pre>python manage.py test --nodb --coverage</pre>
+<pre>python manage.py test --nodb --xmlcoverage</pre>
 
 h2. Local Continuous Integration Command
 
