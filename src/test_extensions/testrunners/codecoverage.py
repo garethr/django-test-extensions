@@ -49,20 +49,22 @@ def get_all_coverage_modules(app_module):
     return mod_list
 
 def run_tests(test_labels, verbosity=1, interactive=True,
-        extra_tests=[], nodatabase=False):
+        extra_tests=[], nodatabase=False, xml_out=False):
     """
     Test runner which displays a code coverage report at the end of the
     run.
     """
-    coverage.use_cache(0)
-    coverage.start()
+    cov = coverage.coverage()
+    cov.erase()
+    cov.use_cache(0)
+    cov.start()
     if nodatabase:
         results = nodatabase_run_tests(test_labels, verbosity, interactive,
             extra_tests)
     else:
         results = django_test_runner(test_labels, verbosity, interactive,
             extra_tests)
-    coverage.stop()
+    cov.stop()
 
     coverage_modules = []
     if test_labels:
@@ -77,6 +79,19 @@ def run_tests(test_labels, verbosity=1, interactive=True,
             coverage_modules.extend(get_all_coverage_modules(app))
 
     if coverage_modules:
-        coverage.report(coverage_modules, show_missing=1)
+        if xml_out:
+            # using the same output directory as the --xml function uses for testing
+            if not os.path.isdir(os.path.join("temp", "xml")):
+                os.makedirs(os.path.join("temp", "xml"))
+            output_filename = 'temp/xml/coverage_output.xml'
+            cov.xml_report(morfs=coverage_modules, outfile=output_filename)
+
+        cov.report(coverage_modules, show_missing=1)
 
     return results
+
+
+def run_tests_xml (test_labels, verbosity=1, interactive=True,
+        extra_tests=[], nodatabase=False):
+    return run_tests(test_labels, verbosity, interactive,
+               extra_tests, nodatabase, xml_out=True)

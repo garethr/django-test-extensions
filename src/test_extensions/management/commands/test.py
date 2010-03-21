@@ -25,11 +25,14 @@ class Command(BaseCommand):
         make_option('--coverage', action='store_true', dest='coverage',
             default=False,
             help='Show coverage details'),
+        make_option('--xmlcoverage', action='store_true', dest='xmlcoverage',
+            default=False,
+            help='Show coverage details and write them into a xml file'),
         make_option('--figleaf', action='store_true', dest='figleaf',
             default=False,
             help='Produce figleaf coverage report'),
         make_option('--xml', action='store_true', dest='xml', default=False,
-            help='Produce xml output for cruise control'),
+            help='Produce JUnit-type xml output'),
         make_option('--nodb', action='store_true', dest='nodb', default=False,
             help='No database required for these tests'),
         #make_option('--skip', action='store', dest='skip', default=False,
@@ -54,11 +57,15 @@ class Command(BaseCommand):
         management._commands['syncdb'] = 'django.core'
 
         if options.get('nodb'):
-            if options.get('coverage'):
+            if options.get('xmlcoverage'):
+                test_runner_name = 'test_extensions.testrunners.nodatabase.run_tests_with_xmlcoverage'
+            elif options.get('coverage'):
                 test_runner_name = 'test_extensions.testrunners.nodatabase.run_tests_with_coverage'
             else:
                 test_runner_name = 'test_extensions.testrunners.nodatabase.run_tests'
-        elif options.get('coverage'):
+        elif options.get('xmlcoverage'):
+            test_runner_name = 'test_extensions.testrunners.codecoverage.run_tests_xml'
+        elif options.get ('coverage'):
             test_runner_name = 'test_extensions.testrunners.codecoverage.run_tests'
         elif options.get('figleaf'):
             test_runner_name = 'test_extensions.testrunners.figleafcoverage.run_tests'

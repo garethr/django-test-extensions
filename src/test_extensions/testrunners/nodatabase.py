@@ -71,7 +71,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
 
     return len(result.failures) + len(result.errors)
 
-def run_tests_with_coverage(test_labels, verbosity=1, interactive=True, extra_tests=[]):
+def run_tests_with_coverage(test_labels, verbosity=1, interactive=True, extra_tests=[], xml_out=False):
     """
     Run the unit tests for all the test labels in the provided list.
     Labels must be of the form:
@@ -98,8 +98,9 @@ def run_tests_with_coverage(test_labels, verbosity=1, interactive=True, extra_te
     modules_to_cover = []
 
     # start doing some coverage action
-    coverage.erase()
-    coverage.start()
+    cov = coverage.coverage()
+    cov.erase()
+    cov.start()
 
     # if passed a list of tests...
     if test_labels:
@@ -132,7 +133,7 @@ def run_tests_with_coverage(test_labels, verbosity=1, interactive=True, extra_te
     teardown_test_environment()
 
     # stop coverage
-    coverage.stop()
+    cov.stop()
 
     # output results
     print ''
@@ -140,6 +141,16 @@ def run_tests_with_coverage(test_labels, verbosity=1, interactive=True, extra_te
     print 'Unit test coverage results'
     print '--------------------------'
     print ''
-    coverage.report(modules_to_cover, show_missing=1)
+    if xml_out:
+        # using the same output directory as the --xml function uses for testing
+        if not os.path.isdir(os.path.join("temp", "xml")):
+            os.makedirs(os.path.join("temp", "xml"))
+        output_filename = 'temp/xml/coverage_output.xml'
+        cov.xml_report(morfs=coverage_modules, outfile=output_filename)
+    cov.report(modules_to_cover, show_missing=1)
 
     return len(result.failures) + len(result.errors)
+
+def run_tests_with_xmlcoverage(test_labels, verbosity=1, interactive=True, extra_tests=[]):
+   return run_tests_with_coverage(test_labels, verbosity, interactive, extra_tests, xml_out=True) 
+
