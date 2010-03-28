@@ -38,8 +38,10 @@ class Command(BaseCommand):
             help='Produce JUnit-type xml output'),
         make_option('--nodb', action='store_true', dest='nodb', default=False,
             help='No database required for these tests'),
-        #make_option('--skip', action='store', dest='skip', default=False,
-        #    help='Omit these applications from testing'),  #  TODO  require args if used
+        make_option('--failfast', action='store_true', dest='failfast',
+            default=False,
+            help='Tells Django to stop running the test suite after first failed test.'),
+
     )
     help = """Custom test command which allows for
         specifying different test runners."""
@@ -49,9 +51,15 @@ class Command(BaseCommand):
 
     def handle(self, *test_labels, **options):
 
+        # Limit the tested apps to defined in TEST_APPS, unless user asks
+        # for other apps.
+        if not test_labels and settings.TEST_APPS:
+            test_labels = settings.TEST_APPS
+
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
         callgraph = options.get('callgraph', False)
+        failfast = options.get("failfast", False)
 
         # it's quite possible someone, lets say South, might have stolen
         # the syncdb command from django. For testing purposes we should
@@ -98,18 +106,20 @@ class Command(BaseCommand):
                     test_labels.remove(app)
                 except ValueError:
                     pass
+                    
+        test_options = dict(verbosity=verbosity,
+            interactive=interactive)
+            
+        if failfast:
+            test_options["failfast"] = failfast
+
+        if options.get('coverage'):
+            test_options["callgraph"] = callgraph
+        
         try:
-        
-            if options.get('coverage'):
-                failures = test_runner(test_labels, verbosity=verbosity,
-                        interactive=interactive, callgraph=callgraph)
-            else:
-                failures = test_runner(test_labels, verbosity=verbosity,
-                        interactive=interactive)
-        
+            failures = test_runner(test_labels, **test_options)
         except TypeError: #Django 1.2
-            failures = test_runner(verbosity=verbosity, #TODO extend django.test.simple.DjangoTestSuiteRunner
-                                   interactive=interactive).run_tests(test_labels)
+            failures = test_runner(**test_options).run_tests(test_labels)
         
         if failures:
             sys.exit(failures)

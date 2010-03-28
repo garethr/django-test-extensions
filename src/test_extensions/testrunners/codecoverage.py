@@ -45,6 +45,7 @@ def is_wanted_module(mod):
             marked_to_include = True
 
     return marked_to_include
+    
 
 def get_coverage_modules(app_module):
     """
@@ -196,5 +197,3 @@ def run_tests_xml (test_labels, verbosity=1, interactive=True,
         extra_tests=[], nodatabase=False):
     return run_tests(test_labels, verbosity, interactive,
                extra_tests, nodatabase, xml_out=True)
-
-
