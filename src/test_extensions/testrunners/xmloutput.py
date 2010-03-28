@@ -8,10 +8,10 @@ from django.utils.html import escape
 
 def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     setup_test_environment()
-    
-    settings.DEBUG = False    
+
+    settings.DEBUG = False
     suite = unittest.TestSuite()
-    
+
     if test_labels:
         for label in test_labels:
             if '.' in label:
@@ -22,7 +22,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     else:
         for app in get_apps():
             suite.addTest(build_suite(app))
-    
+
     for test in extra_tests:
         suite.addTest(test)
 
@@ -31,9 +31,9 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     connection.creation.create_test_db(verbosity, autoclobber=not interactive)
     result = XMLTestRunner(verbosity=verbosity).run(suite)
     connection.creation.destroy_test_db(old_name, verbosity)
-    
+
     teardown_test_environment()
-    
+
     return len(result.failures) + len(result.errors)
 
 
@@ -64,28 +64,48 @@ class _XmlTextTestResult(unittest.TestResult):
         else:
             return str(test)
 
-    def startTest(self, test):
+    def startTest(self, test):  #  CONSIDER  why are there 2 startTests in here?
         self._startTime = time.time()
+        test._extraXML = ''
+        test._extraAssertions = []
         TestResult.startTest(self, test)
         self.stream.write('<testcase classname="%s' % test.__class__.__name__ + '" name="%s' % test.id().split('.')[-1] + '"')
+        desc = test.shortDescription()
+
+        if desc:
+            desc = _cleanHTML(desc)
+            self.stream.write(' desc="%s"' % desc)
 
     def stopTest(self, test):
         stopTime = time.time()
         deltaTime = stopTime - self._startTime
         TestResult.stopTest(self, test)
         self.stream.write(' time="%.3f"' % deltaTime)
-        if self._lastWas == 'success':
-            self.stream.write('/>')
-        else:
-            self.stream.write('>')
+        self.stream.write('>')
+        if self._lastWas != 'success':
             if self._lastWas == 'error':
                 self.stream.write(self._errorsAndFailures)
             elif self._lastWas == 'failure':
                 self.stream.write(self._errorsAndFailures)
             else:
                 assert(False)
-            self.stream.write('</testcase>')
+
+        seen = {}
+
+        for assertion in test._extraAssertions:
+            if not seen.has_key(assertion):
+                self._addAssertion(assertion[:110]) # :110 avoids tl;dr TODO use a lexical truncator
+                seen[assertion] = True
+
+        self.stream.write('</testcase>')
         self._errorsAndFailures = ""
+
+        if test._extraXML != '':
+            self.stream.write(test._extraXML)
+
+    def _addAssertion(self, diagnostic):
+        diagnostic = _cleanHTML(diagnostic)
+        self.stream.write('<assert>' + diagnostic + '</assert>')
 
     def addSuccess(self, test):
         TestResult.addSuccess(self, test)
@@ -118,3 +138,8 @@ class _XmlTextTestResult(unittest.TestResult):
 
     def printErrorList(self, flavour, errors):
         assert False
+
+def _cleanHTML(whut):
+    return whut.replace('"', '&quot;'). \
+                replace('<', '&lt;').  \
+                replace('>', '&gt;')

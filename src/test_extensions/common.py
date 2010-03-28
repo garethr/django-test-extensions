@@ -12,8 +12,8 @@ from BeautifulSoup import BeautifulSoup as Soup
 
 # needed to login to the admin
 from django.contrib.auth.models import User
-
 from django.utils.encoding import smart_str
+
 
 class Common(TestCase):
     """
@@ -50,30 +50,33 @@ class Common(TestCase):
     # Custom assertions
 
     def assert_equal(self, *args, **kwargs):
-        "Assert that two values are equal"
+        'Assert that two values are equal'
+
         return self.assertEqual(*args, **kwargs)
 
     def assert_not_equal(self, *args, **kwargs):
         "Assert that two values are not equal"
         return not self.assertNotEqual(*args, **kwargs)
 
-    def assert_contains(self, needle, haystack):
-        "Assert that one value (the hasystack) contains another value (the needle)"
-        return self.assert_(needle in haystack, "Content should contain `%s' but doesn't:\n%s" % (needle, haystack))
+    def assert_contains(self, needle, haystack, diagnostic=''):
+        'Assert that one value (the hasystack) contains another value (the needle)'
+        diagnostic = diagnostic + "\nContent should contain `%s' but doesn't:\n%s" % (needle, haystack)
+        diagnostic = diagnostic.strip()
+        return self.assert_(needle in haystack, diagnostic)
 
     def assert_doesnt_contain(self, needle, haystack):  #  CONSIDER  deprecate me for deny_contains
         "Assert that one value (the hasystack) does not contain another value (the needle)"
         return self.assert_(needle not in haystack, "Content should not contain `%s' but does:\n%s" % (needle, haystack))
 
-    def deny_contain(self, needle, haystack):
+    def deny_contains(self, needle, haystack):
         "Assert that one value (the hasystack) does not contain another value (the needle)"
         return self.assert_(needle not in haystack, "Content should not contain `%s' but does:\n%s" % (needle, haystack))
 
     def assert_regex_contains(self, pattern, string, flags=None):
-        "Assert that the given regular expression matches the string"
+        'Assert that the given regular expression matches the string'
         flags = flags or 0
         disposition = re.search(pattern, string, flags)
-        self.assertTrue(disposition != None, pattern + ' not found in ' + string)
+        self.assertTrue(disposition != None, repr(smart_str(pattern)) + ' should match ' + repr(smart_str(string)))
 
     def deny_regex_contains(self, pattern, slug):
         'Deny that the given regular expression pattern matches a string'
@@ -131,39 +134,38 @@ class Common(TestCase):
         except AttributeError:
             assert(False)
 
-    def _xml_to_tree(self, xml):
+    def _xml_to_tree(self, xml, forgiving=False):
         from lxml import etree
         self._xml = xml
 
-        try:
-            if '<html' in xml[:200]:
-                return etree.HTML(xml)
-            else:
-                return etree.XML(xml)
+        if not isinstance(xml, basestring):
+            self._xml = str(xml)  #  TODO  tostring
+            return xml
 
-        except ValueError:  #  TODO  don't rely on exceptions for normal control flow
-            tree = xml
-            self._xml = str(tree)  #  CONSIDER  does this reconstitute the nested XML ?
-            return tree
+        if '<html' in xml[:200]:
+            parser = etree.HTMLParser(recover=forgiving)
+            return etree.HTML(str(xml), parser)
+        else:
+            parser = etree.XMLParser(recover=forgiving)
+            return etree.XML(str(xml))
 
     def assert_xml(self, xml, xpath, **kw):
         'Check that a given extent of XML or HTML contains a given XPath, and return its first node'
-
-        tree = self._xml_to_tree(xml)
+        tree = self._xml_to_tree(xml, forgiving=kw.get('forgiving', False))
         nodes = tree.xpath(xpath)
-        self.assertTrue(len(nodes) > 0, xpath + ' not found in ' + self._xml)
+        self.assertTrue(len(nodes) > 0, xpath + ' should match ' + self._xml)
         node = nodes[0]
-        if kw.get('verbose', False):  self.reveal_xml(node)  #  "here have ye been? What have ye seen?"--Morgoth
+        if kw.get('verbose', False):
+            self.reveal_xml(node)
         return node
 
     def reveal_xml(self, node):
         'Spews an XML node as source, for diagnosis'
-
-        print etree.tostring(node, pretty_print=True)  #  CONSIDER  does pretty_print work? why not?
+        from lxml import etree
+        print etree.tostring(node, pretty_print=True)
 
     def deny_xml(self, xml, xpath):
         'Check that a given extent of XML or HTML does not contain a given XPath'
-
         tree = self._xml_to_tree(xml)
         nodes = tree.xpath(xpath)
         self.assertEqual(0, len(nodes), xpath + ' should not appear in ' + self._xml)
