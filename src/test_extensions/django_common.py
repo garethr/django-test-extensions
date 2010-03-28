@@ -129,6 +129,28 @@ class DjangoCommon(Common):
         if len(mails) == 1:  return mails[0]
         return mails
 
+    def assert_latest(self, query_set, lamb):
+        pks = list(query_set.values_list('pk', flat=True).order_by('-pk'))
+        high_water_mark = (pks+[0])[0]
+        lamb()
+
+          # NOTE we ass-ume the database generates primary keys in monotonic order.
+          #         Don't use these techniques in production,
+          #          or in the presence of a pro DBA
+
+        nu_records = list(query_set.filter(pk__gt=high_water_mark).order_by('pk'))
+        if len(nu_records) == 1:  return nu_records[0]
+        if nu_records:  return nu_records  #  treating the returned value as a scalar or list
+                                           #  implicitly asserts it is a scalar or list
+        source = open(lamb.func_code.co_filename, 'r').readlines()[lamb.func_code.co_firstlineno - 1]
+        source = source.replace('lambda:', '').strip()
+        model_name = str(query_set.model)
+
+        self.assertFalse(True, 'The called block, `' + source +
+                               '` should produce new ' + model_name + ' records')
+
+#  TODO  deny_latest!
+
     def deny_mail(self, funk):
         '''checks that the called block keeps its opinions to itself'''
 
