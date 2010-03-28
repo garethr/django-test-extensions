@@ -42,7 +42,7 @@ class Command(BaseCommand):
         specifying different test runners."""
     args = '[appname ...]'
 
-    requires_model_validation = False
+    requires_model_validation = True
 
     def handle(self, *test_labels, **options):
 
