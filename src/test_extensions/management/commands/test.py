@@ -51,11 +51,6 @@ class Command(BaseCommand):
 
     def handle(self, *test_labels, **options):
 
-        # Limit the tested apps to defined in TEST_APPS, unless user asks
-        # for other apps.
-        if not test_labels and settings.TEST_APPS:
-            test_labels = settings.TEST_APPS
-
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
         callgraph = options.get('callgraph', False)
