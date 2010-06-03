@@ -6,6 +6,16 @@ from xmlunit.unittest import _WritelnDecorator, XmlTextTestRunner as his_XmlText
 from django.test.simple import *
 from django.utils.html import escape
 
+
+try:
+    class XMLTestSuiteRunner(DjangoTestSuiteRunner):
+    
+        def run_suite(self, suite, **kwargs):
+            return XMLTestRunner(verbosity=self.verbosity).run(suite)
+
+except NameError:  # DjangoTestSuiteRunner is not available in Django < 1.2
+    pass
+
 def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     setup_test_environment()
 
