@@ -148,8 +148,6 @@ def run_tests(test_labels, verbosity=1, interactive=True,
         results = nodatabase_run_tests(test_labels, verbosity, interactive,
             extra_tests)
     else:
-        from django.db import connection
-        connection.creation.destroy_test_db = lambda *a, **k: None
         results = django_test_runner(test_labels, verbosity, interactive,
             extra_tests)
     
