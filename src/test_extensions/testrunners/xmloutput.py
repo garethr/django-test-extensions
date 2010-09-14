@@ -4,7 +4,17 @@ from unittest import TestResult
 from xmlunit.unittest import _WritelnDecorator, XmlTextTestRunner as his_XmlTextTestRunner
 
 from django.test.simple import *
-from django.utils.html import escape
+from xml.sax.saxutils import escape
+
+
+try:
+    class XMLTestSuiteRunner(DjangoTestSuiteRunner):
+    
+        def run_suite(self, suite, **kwargs):
+            return XMLTestRunner(verbosity=self.verbosity).run(suite)
+
+except NameError:  # DjangoTestSuiteRunner is not available in Django < 1.2
+    pass
 
 def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     setup_test_environment()
@@ -118,8 +128,8 @@ class _XmlTextTestResult(unittest.TestResult):
         self._lastWas = 'error'
         self._errorsAndFailures += '<error type="%s">' % err[0].__name__
         for line in apply(traceback.format_exception, err):
-           for l in string.split(line,"\n")[:-1]:
-              self._errorsAndFailures += "%s" % l
+           for l in line.split("\n")[:-1]:
+              self._errorsAndFailures += escape(l)
         self._errorsAndFailures += "</error>"
 
     def addFailure(self, test, err):
@@ -129,8 +139,8 @@ class _XmlTextTestResult(unittest.TestResult):
         self._lastWas = 'failure'
         self._errorsAndFailures += '<failure type="%s">' % err[0].__name__
         for line in apply(traceback.format_exception, err):
-           for l in string.split(line,"\n")[:-1]:
-              self._errorsAndFailures += "%s" % l
+           for l in line.split("\n")[:-1]:
+              self._errorsAndFailures += escape(l)
         self._errorsAndFailures += "</failure>"
 
     def printErrors(self):
