@@ -1,5 +1,4 @@
 import time, traceback, string
-from unittest import TestResult
 
 from xmlunit.unittest import _WritelnDecorator, XmlTextTestRunner as his_XmlTextTestRunner
 
@@ -9,10 +8,8 @@ from xml.sax.saxutils import escape
 
 try:
     class XMLTestSuiteRunner(DjangoTestSuiteRunner):
-    
         def run_suite(self, suite, **kwargs):
             return XMLTestRunner(verbosity=self.verbosity).run(suite)
-
 except NameError:  # DjangoTestSuiteRunner is not available in Django < 1.2
     pass
 
@@ -59,7 +56,7 @@ class _XmlTextTestResult(unittest.TestResult):
     #separator1 = '=' * 70
     #separator2 = '-' * 70
     def __init__(self, stream, descriptions, verbosity):
-        TestResult.__init__(self)
+        unittest.TestResult.__init__(self)
         self.stream = _WritelnDecorator(stream)
         self.showAll = verbosity > 1
         self.descriptions = descriptions
@@ -78,7 +75,7 @@ class _XmlTextTestResult(unittest.TestResult):
         self._startTime = time.time()
         test._extraXML = ''
         test._extraAssertions = []
-        TestResult.startTest(self, test)
+        unittest.TestResult.startTest(self, test)
         self.stream.write('<testcase classname="%s' % test.__class__.__name__ + '" name="%s' % test.id().split('.')[-1] + '"')
         desc = test.shortDescription()
 
@@ -89,7 +86,7 @@ class _XmlTextTestResult(unittest.TestResult):
     def stopTest(self, test):
         stopTime = time.time()
         deltaTime = stopTime - self._startTime
-        TestResult.stopTest(self, test)
+        unittest.TestResult.stopTest(self, test)
         self.stream.write(' time="%.3f"' % deltaTime)
         self.stream.write('>')
         if self._lastWas != 'success':
@@ -118,11 +115,11 @@ class _XmlTextTestResult(unittest.TestResult):
         self.stream.write('<assert>' + diagnostic + '</assert>')
 
     def addSuccess(self, test):
-        TestResult.addSuccess(self, test)
+        unittest.TestResult.addSuccess(self, test)
         self._lastWas = 'success'
 
     def addError(self, test, err):
-        TestResult.addError(self, test, err)
+        unittest.TestResult.addError(self, test, err)
         if err[0] is KeyboardInterrupt:
             self.shouldStop = 1
         self._lastWas = 'error'
@@ -133,7 +130,7 @@ class _XmlTextTestResult(unittest.TestResult):
         self._errorsAndFailures += "</error>"
 
     def addFailure(self, test, err):
-        TestResult.addFailure(self, test, err)
+        unittest.TestResult.addFailure(self, test, err)
         if err[0] is KeyboardInterrupt:
             self.shouldStop = 1
         self._lastWas = 'failure'
