@@ -51,6 +51,8 @@ Sometimes your don't want the overhead of setting up a database during testing, 
 <pre>python manage.py test --nodb --coverage</pre>
 <pre>python manage.py test --nodb --xmlcoverage</pre>
 
+*WARNING* Don't use this if you use the ORM in your app. An "outstanding issue":http://github.com/garethr/django-test-extensions/issues#issue/13 means that you can get into trouble. Your tests will still hit the database, but it will be your non test data. 
+
 h2. Local Continuous Integration Command
 
 Thanks to Roberto Aguilar (http://github.com/rca) for providing a auto-reloading version of the test runner. Run the runtester command and it should run your test suite whenever you change a file (similar to how runserver reloads the server each time you change something.)
