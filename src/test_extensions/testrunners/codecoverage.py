@@ -88,7 +88,7 @@ def get_all_coverage_modules(app_module):
     return mod_list
 
 def run_tests(test_labels, verbosity=1, interactive=True,
-        extra_tests=[], nodatabase=False, xml_out=False, callgraph=False):
+        extra_tests=[], nodatabase=False, xml_out=False, callgraph=False, html_only=False):
     """
     Test runner which displays a code coverage report at the end of the
     run.
@@ -156,7 +156,6 @@ def run_tests(test_labels, verbosity=1, interactive=True,
 
     cov.stop()
     
-    report_methd = cov.report
     if getattr(settings, "COVERAGE_HTML_REPORT", False) or \
             os.environ.get("COVERAGE_HTML_REPORT"):
         output_dir = getattr(settings, "COVERAGE_HTML_DIRECTORY", "covhtml")
@@ -186,7 +185,8 @@ def run_tests(test_labels, verbosity=1, interactive=True,
             output_filename = 'temp/xml/coverage_output.xml'
             cov.xml_report(morfs=coverage_modules, outfile=output_filename)
 
-        cov.report(coverage_modules, show_missing=1)
+        if not html_only:
+            cov.report(coverage_modules, show_missing=1)
 
     return results
 

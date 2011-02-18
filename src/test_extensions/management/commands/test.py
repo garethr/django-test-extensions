@@ -37,6 +37,9 @@ class Command(BaseCommand):
         make_option('--coverage', action='store_true', dest='coverage',
             default=False,
             help='Show coverage details'),
+        make_option('--coverage_html_only', action='store_true', dest='coverage_html_only',
+            default=False,
+            help='Supress stdout output if using HTML output. Else, is ignored'),
         make_option('--xmlcoverage', action='store_true', dest='xmlcoverage',
             default=False,
             help='Show coverage details and write them into a xml file'),
@@ -64,6 +67,7 @@ class Command(BaseCommand):
         interactive = options.get('interactive', True)
         callgraph = options.get('callgraph', False)
         failfast = options.get("failfast", False)
+        coverage_html_only = options.get("coverage_html_only", False)
 
         # it's quite possible someone, lets say South, might have stolen
         # the syncdb command from django. For testing purposes we should
@@ -116,6 +120,7 @@ class Command(BaseCommand):
             
         if options.get('coverage'):
             test_options["callgraph"] = callgraph
+            test_options["html_only"] = coverage_html_only
         
         try:
             failures = test_runner(test_labels, **test_options)
