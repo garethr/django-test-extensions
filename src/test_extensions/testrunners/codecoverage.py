@@ -176,8 +176,6 @@ def run_tests(test_labels, verbosity=1, interactive=True,
     else:
         report_method = cov.report
 
-    morfs and report_method(morfs=morfs)
-
     if coverage_modules:
         if xml_out:
             # using the same output directory as the --xml function uses for testing
