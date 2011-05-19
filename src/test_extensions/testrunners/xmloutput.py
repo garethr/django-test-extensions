@@ -3,6 +3,7 @@ import time, traceback, string
 from xmlunit.unittest import _WritelnDecorator, XmlTextTestRunner as his_XmlTextTestRunner
 
 from django.test.simple import *
+from django.utils import unittest
 from xml.sax.saxutils import escape
 
 
