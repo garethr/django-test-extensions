@@ -3,9 +3,13 @@ import time, traceback, string
 from xmlunit.unittest import _WritelnDecorator, XmlTextTestRunner as his_XmlTextTestRunner
 
 from django.test.simple import *
-from django.utils import unittest
 from xml.sax.saxutils import escape
 
+try:
+    # The django.utils.unittest alias is available in Django >= 1.3
+    from django.utils import unittest
+except ImportError:
+    import unittest
 
 try:
     class XMLTestSuiteRunner(DjangoTestSuiteRunner):
