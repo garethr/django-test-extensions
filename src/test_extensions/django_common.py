@@ -4,6 +4,7 @@ import re
 
 # needed to login to the admin
 from django.contrib.auth.models import User
+from django.utils.encoding import smart_str
 
 from django.template import Template, Context
 
