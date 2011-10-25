@@ -9,7 +9,7 @@ from glob import glob
 
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.conf import settings
-from django.test.simple import *
+from django.test.simple import get_app, build_test, build_suite
 
 import coverage
 
